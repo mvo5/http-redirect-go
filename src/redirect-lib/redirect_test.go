@@ -35,17 +35,17 @@ func assertRedirectLocation(t *testing.T, redirect_from, redirect_to string) {
 func TestRedirectRoot(t *testing.T) {
 	// setup
 	redirect_from := "localhost:54321"
-	redirect_to := "http://example.com"
+	redirect_to := "http://example.com/"
 	go DoRedirect(redirect_from, redirect_to)
 
 	// FIXME: find a more elegant way to know when GoRedirect is ready
 	time.Sleep(500 * time.Millisecond)
 
 	// test redirect for "/"
-	assertRedirectLocation(t, "http://"+redirect_from, redirect_to + "/")
+	assertRedirectLocation(t, "http://"+redirect_from, redirect_to)
 
 	// test redirect for "/some/other"
-	assertRedirectLocation(t,"http://"+redirect_from+"/random/string/", redirect_to + "/random/string/")
+	assertRedirectLocation(t,"http://"+redirect_from+"/random/string/", redirect_to + "random/string/")
 
 	// teardown (how to stop it again?)
 }
