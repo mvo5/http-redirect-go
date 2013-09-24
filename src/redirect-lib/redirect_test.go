@@ -5,7 +5,18 @@ import (
 	"testing"
 )
 
-func assertRedirectLocation(t *testing.T, resp* http.Response, err error, redirect_to string) {
+
+func assertRedirectLocation(t *testing.T, redirect_from, redirect_to string) {
+
+	// we can't use http.Client.Get() here as this follows redirects
+	// and we want the original (no-redirected) reply
+	req, err := http.NewRequest("GET", redirect_from, nil)
+	if err != nil {
+		t.Error("http.NewRequest failed")
+	}
+	tr := &http.Transport{}
+	resp, err := tr.RoundTrip(req)
+
 	if err != nil {
 		t.Error("Error on http.Get (%s)", err);
 	}
@@ -14,6 +25,10 @@ func assertRedirectLocation(t *testing.T, resp* http.Response, err error, redire
 			resp.Header["Location"][0],
 			" want. ", redirect_to)
 	}
+	if resp.StatusCode != 301 {
+		t.Error("Unexpected status  " + resp.Status)
+	}
+
 }
 
 func TestRedirectRoot(t *testing.T) {
@@ -23,12 +38,10 @@ func TestRedirectRoot(t *testing.T) {
 	go DoRedirect(redirect_from, redirect_to)
 
 	// test redirect for "/"
-	resp, err := http.Get("http://"+redirect_from) 
-	assertRedirectLocation(t, resp, err, redirect_to + "/")
+	assertRedirectLocation(t, "http://"+redirect_from, redirect_to + "/")
 
 	// test redirect for "/some/other"
-	resp, err = http.Get("http://"+redirect_from+"/random/string/") 
-	assertRedirectLocation(t, resp, err, redirect_to + "/random/string/")
+	assertRedirectLocation(t,"http://"+redirect_from+"/random/string/", redirect_to + "/random/string/")
 
 	// teardown (how to stop it again?)
 }
