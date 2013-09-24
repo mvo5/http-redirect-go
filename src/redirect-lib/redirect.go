@@ -1,7 +1,8 @@
 package redirect
 
 import (
-    "net/http"
+	"log"
+	"net/http"
 )
 
 // FIXME: is there a more elegant way than a "package" wide var?
@@ -15,5 +16,8 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 func DoRedirect(redirect_from, redirect_to string) {
 	global_redirect_to = redirect_to
         http.HandleFunc("/", redirectHandler)
-        http.ListenAndServe(redirect_from, nil)
+        err := http.ListenAndServe(redirect_from, nil)
+	if (err != nil) {
+		log.Fatal("ListenAndServer: ", err)
+	}
 }
