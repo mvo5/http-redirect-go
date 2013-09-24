@@ -10,8 +10,9 @@ func assertRedirectLocation(t *testing.T, resp* http.Response, err error, redire
 		t.Error("Error on http.Get (%s)", err);
 	}
 	if resp.Header["Location"][0] != redirect_to {
-		t.Error("Unexpected Location header ", 
-			resp.Header["Location"][0] + " != " + redirect_to)
+		t.Error("Unexpected Location header got: ",
+			resp.Header["Location"][0],
+			" want. ", redirect_to)
 	}
 }
 
@@ -23,11 +24,11 @@ func TestRedirectRoot(t *testing.T) {
 
 	// test redirect for "/"
 	resp, err := http.Get("http://"+redirect_from) 
-	assertRedirectLocation(t, resp, err, redirect_to)
+	assertRedirectLocation(t, resp, err, redirect_to + "/")
 
 	// test redirect for "/some/other"
-	resp, err = http.Get("http://"+redirect_from+"/random/string") 
-	assertRedirectLocation(t, resp, err, redirect_to)
+	resp, err = http.Get("http://"+redirect_from+"/random/string/") 
+	assertRedirectLocation(t, resp, err, redirect_to + "/random/string/")
 
 	// teardown (how to stop it again?)
 }
