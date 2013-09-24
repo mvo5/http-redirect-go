@@ -5,16 +5,17 @@ import (
 )
 
 // FIXME:
-// - tests
-// - hardcoded uni-trier
 // - route /*
 
+// FIXME: is there a more elegant way than a "package" wide var?
+var global_redirect_to string;
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "http://www.uni-trier.de", 0)
+	http.Redirect(w, r, global_redirect_to, 0)
 }
 
-func DoRedirect(redirect_to string) {
+func DoRedirect(redirect_from, redirect_to string) {
+	global_redirect_to = redirect_to
     http.HandleFunc("/", redirectHandler)
-    http.ListenAndServe(":8080", nil)
+    http.ListenAndServe(redirect_from, nil)
 }
