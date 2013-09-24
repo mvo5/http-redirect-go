@@ -20,3 +20,10 @@ To run:
 ```
 $ ./redirect-app
 ```
+
+To cross-build for windows do:
+```
+$ sudo apt-get install golang-go-windows-386
+$ GOARCH=386 GOOS=windows go build redirect-app 
+```
+
