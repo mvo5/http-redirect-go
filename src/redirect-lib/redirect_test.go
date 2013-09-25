@@ -1,9 +1,9 @@
 package redirect
 
 import (
+	"net"
 	"net/http"
 	"testing"
-	"time"
 )
 
 
@@ -38,8 +38,14 @@ func TestRedirectRoot(t *testing.T) {
 	redirect_to := "http://example.com/"
 	go DoRedirect(redirect_from, redirect_to)
 
-	// FIXME: find a more elegant way to know when GoRedirect is ready
-	time.Sleep(500 * time.Millisecond)
+	// wait for server goroutine to be ready
+	for {
+		conn, err := net.Dial("tcp", redirect_from)
+		if err == nil {
+			conn.Close()
+			break
+		}
+	}
 
 	// test redirect for "/"
 	assertRedirectLocation(t, "http://"+redirect_from, redirect_to)
