@@ -32,20 +32,29 @@ func assertRedirectLocation(t *testing.T, redirect_from, redirect_to string) {
 
 }
 
+func busy_wait_for_tcp_addr(addr string) {
+	for {
+		conn, err := net.Dial("tcp", addr)
+		if err == nil {
+			conn.Close()
+			return
+		}
+	}
+}
+
 func TestRedirectRoot(t *testing.T) {
 	// setup
 	redirect_from := "localhost:54321"
 	redirect_to := "http://example.com/"
 	go DoRedirect(redirect_from, redirect_to)
+	busy_wait_for_tcp_addr(redirect_from)
+
+	redirect_from_2 := "localhost:54322"
+	redirect_to_2 := "http://another.example.com/"
+	go DoRedirect(redirect_from_2, redirect_to_2)
 
 	// wait for server goroutine to be ready
-	for {
-		conn, err := net.Dial("tcp", redirect_from)
-		if err == nil {
-			conn.Close()
-			break
-		}
-	}
+	busy_wait_for_tcp_addr(redirect_from_2)
 
 	// test redirect for "/"
 	assertRedirectLocation(t, "http://"+redirect_from, redirect_to)
@@ -54,4 +63,8 @@ func TestRedirectRoot(t *testing.T) {
 	assertRedirectLocation(t,"http://"+redirect_from+"/random/string/", redirect_to + "random/string/")
 
 	// teardown (how to stop it again?)
+}
+
+func TestRedirectDifferentPort(t *testing.T) {
+	
 }
