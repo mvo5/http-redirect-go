@@ -14,11 +14,26 @@ for linux/windows/macos (and some BSDs).
 Build & Test
 ------------
 
+You need a working go environment, e.g. on ubuntu via
+```
+$ sudo apt-get install golang 
+```
+
+Then:
+```
+$ make && sudo make install
+```
+This will install the binary and a apparmor profile for it.
+
+
+Manual commands:
+----------------
+
 To get started run:
 ```
 $ . env.sh
 ```
-to setup the GO workspace environment (its just GOPATH really)
+to setup the GO workspace environment (its just GOPATH)
 
 Then build with:
 ```
